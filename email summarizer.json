@@ -1,0 +1,146 @@
+{
+  "name": "email summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "id": "a85572a3-0a75-4426-adf0-c9440b951bf4",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -192,
+        64
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nMQbas8jNMH68VBS",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "='You are an email assistant. For every incoming email, do two things. First, classify it into one of three categories: urgent, spam, or normal. Second, write a short, polite reply appropriate to that category. Return your answer as JSON with two fields, category and reply':{{ $json.snippet }}",
+        "options": {
+          "systemMessage": "You are an email summarizer. Always reply in 2-3 short, clear bullet points. Don't add extra commentary."
+        }
+      },
+      "id": "59a20a6d-11d3-4828-9220-b54f027a0f7d",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        128,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano"
+        },
+        "options": {}
+      },
+      "id": "aa4753f4-309e-43d2-a4ac-431e06fe8cd9",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        224
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "exGrJBNcmSFM1CLq",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "madiha57sehar@gmail.com",
+        "subject": "=",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        544,
+        64
+      ],
+      "id": "b27126fa-1524-4ce9-a21c-e11cc2c89fe0",
+      "name": "Send a message",
+      "webhookId": "d44c2f6f-2925-44bf-9867-c8edcaa9a8d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "nMQbas8jNMH68VBS",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a6776229-d3f8-4a1e-b3da-0365c1f8c2d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "13e86485edfef1fcf187a348e2d9bfd3bde10d4cde3e33101258ed20b2641669"
+  },
+  "nodeGroups": [],
+  "id": "Edf2C9REig2FazOu",
+  "tags": []
+}
